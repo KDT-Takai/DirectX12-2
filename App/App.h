@@ -34,6 +34,8 @@ private:
 	IDXGISwapChain3* m_pSwapChain;
     // カラーバッファ
 	ID3D12Resource* m_pColorBuffer[FrameCount];
+	// コマンドアロケータ
+	ID3D12CommandAllocator* m_pCmdAllocator[FrameCount];
     // コマンドリスト
 	ID3D12GraphicsCommandList* m_pCmdList;
     // ディスクリプタヒープ
@@ -42,8 +44,8 @@ private:
 	ID3D12Fence* m_pFence;
     // フェンスイベント
     HANDLE m_FenceEvent;
-    // フェンスカウント
-	uint64_t m_FenceCount[FrameCount];
+    // フェンスカウンター
+	uint64_t m_FenceCounter[FrameCount];
     // フレーム番号
 	uint32_t m_FrameIndex;
     // CPUディスクリプタ
