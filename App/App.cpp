@@ -129,6 +129,27 @@ void App::MainLoop()
     }
 }
 
+bool App::InitD3D()
+{
+    return false;
+}
+
+void App::TermD3D()
+{
+}
+
+void App::Render()
+{
+}
+
+void App::WaitGpu()
+{
+}
+
+void App::Present(uint32_t interval)
+{
+}
+
 LRESULT CALLBACK App::WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
     switch(msg)
