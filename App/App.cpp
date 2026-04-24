@@ -332,6 +332,7 @@ void App::Render()
 
 void App::WaitGpu()
 {
+    // TODO assertのエラー消す
     assert(m_pQueue != nullptr);
     assert(m_pFence != nullptr);
     assert(m_FenceEvent != nullptr);
