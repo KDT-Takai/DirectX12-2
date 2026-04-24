@@ -332,10 +332,37 @@ void App::Render()
 
 void App::WaitGpu()
 {
+    assert(m_pQueue != nullptr);
+    assert(m_pFence != nullptr);
+    assert(m_FenceEvent != nullptr);
+	// シグナル処理
+    m_pQueue->Signal(m_pFence, m_FenceCounter[m_FrameIndex]);
+    // 完了時にイベントを設定する
+    m_pFence->SetEventOnCompletion(m_FenceCounter[m_FrameIndex], m_FenceEvent);
+    // 待機処理
+    WaitForSingleObjectEx(m_FenceEvent, INFINITE, FALSE);
+	// フェンスカウンターをインクリメント
+	m_FenceCounter[m_FrameIndex]++;
+
 }
 
 void App::Present(uint32_t interval)
 {
+    // 画面に表示
+    m_pSwapChain->Present(interval, 0);
+    // シグナル処理
+    const auto currentValue = m_FenceCounter[m_FrameIndex];
+    m_pQueue->Signal(m_pFence, currentValue);
+    // バックバッファ番号を更新
+    m_FrameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
+    // 次のフレームの描画準備がまだであれば待機
+    if (m_pFence->GetCompletedValue() < m_FenceCounter[m_FrameIndex])
+    {
+        m_pFence->SetEventOnCompletion(m_FenceCounter[m_FrameIndex], m_FenceEvent);
+        WaitForSingleObjectEx(m_FenceEvent, INFINITE, FALSE);
+    }
+	// フェンスカウンターをインクリメント
+    m_FenceCounter[m_FrameIndex] = currentValue + 1;
 }
 
 LRESULT CALLBACK App::WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
