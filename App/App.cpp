@@ -1,6 +1,5 @@
 ﻿#include "App.h"
 
-
 namespace {
     const auto ClassName = TEXT("SampleWindowClass");
 
@@ -14,7 +13,6 @@ namespace {
         }
     }
 }
-
 
 App::App(uint32_t width, uint32_t height) : m_hInst(nullptr) , m_hWnd(nullptr) , m_Width(width) , m_Height(height) {}
 
@@ -141,8 +139,20 @@ void App::MainLoop()
 
 bool App::InitD3D()
 {
+#if defined(DEBUG) || defined(_DEBUG)
+    {
+        ComPtr<ID3D12Debug> debug;
+        auto hr = D3D12GetDebugInterface(IID_PPV_ARGS(debug.GetAddressOf()));
+        // デバッグレイヤーの有効化
+        if (SUCCEEDED(hr))
+        {
+            debug->EnableDebugLayer();
+        }
+    }
+#endif
+
 	// デバイスの初期化
-    auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDevice));
+    auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(m_pDevice.GetAddressOf()));
     if (FAILED(hr))
     {
         return false;
@@ -285,13 +295,42 @@ bool App::InitD3D()
 
 void App::TermD3D()
 {
+    // GPU処理の完了を待機
+    WaitGpu();
+    // イベント破棄
+    if (m_FenceEvent != nullptr)
+    {
+        CloseHandle(m_FenceEvent);
+        m_FenceEvent = nullptr;
+    }
+    // フェンス破棄
+    m_pFence.Reset();
+    // レンダーターゲットビュー破棄
+    m_pHeapRTV.Reset();
+    for (auto i = 0u; i < FrameCount; ++i)
+    {
+        m_pColorBuffer[i].Reset();
+    }
+    // コマンドリスト破棄
+    m_pColorBuffer->Reset();
+    // コマンドアロケータ破棄
+    for (auto i = 0u; i < FrameCount; ++i)
+    {
+		m_pCmdAllocator[i].Reset();
+    }
+	// スワップチェイン破棄
+    m_pSwapChain.Reset();
+	// コマンドキュー破棄
+	m_pQueue.Reset();
+	// デバイス破棄
+    m_pDevice.Reset();
 }
 
 void App::Render()
 {
     // コマンドの記録を開始
 	m_pCmdAllocator[m_FrameIndex]->Reset();
-    m_pCmdList->Reset(m_pCmdAllocator[m_FrameIndex], nullptr);
+    m_pCmdList->Reset(m_pCmdAllocator[m_FrameIndex].Get(), nullptr);
     // リソースバリアの設定
     D3D12_RESOURCE_BARRIER barrier = {};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;

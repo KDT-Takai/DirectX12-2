@@ -3,9 +3,14 @@
 #include <cstdint>
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <wrl/client.h>
+
+#include <cassert>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+
+template <typename T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 class App
 {
@@ -27,21 +32,21 @@ private:
     // ウィンドウの縦幅
     uint32_t m_Height;
     // デバイス
-    ID3D12Device* m_pDevice;
+    ComPtr<ID3D12Device> m_pDevice;
     // コマンドキュー
-    ID3D12CommandQueue* m_pQueue;
+    ComPtr<ID3D12CommandQueue> m_pQueue;
     // スワップチェイン
-	IDXGISwapChain3* m_pSwapChain;
+    ComPtr<IDXGISwapChain3> m_pSwapChain;
     // カラーバッファ
-	ID3D12Resource* m_pColorBuffer[FrameCount];
-	// コマンドアロケータ
-	ID3D12CommandAllocator* m_pCmdAllocator[FrameCount];
+    ComPtr<ID3D12Resource> m_pColorBuffer[FrameCount];
+    // コマンドアロケータ
+    ComPtr<ID3D12CommandAllocator> m_pCmdAllocator[FrameCount];
     // コマンドリスト
-	ID3D12GraphicsCommandList* m_pCmdList;
+    ComPtr<ID3D12GraphicsCommandList> m_pCmdList;
     // ディスクリプタヒープ
-    ID3D12DescriptorHeap* m_pHeapRTV;
+    ComPtr<ID3D12DescriptorHeap> m_pHeapRTV;
     // フェンス
-	ID3D12Fence* m_pFence;
+    ComPtr<ID3D12Fence> m_pFence;
     // フェンスイベント
     HANDLE m_FenceEvent;
     // フェンスカウンター
@@ -50,6 +55,7 @@ private:
 	uint32_t m_FrameIndex;
     // CPUディスクリプタ
 	D3D12_CPU_DESCRIPTOR_HANDLE m_HandleRTV[FrameCount];
+
 
     bool InitApp();
     void TermApp();
