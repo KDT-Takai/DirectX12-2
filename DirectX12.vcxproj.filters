@@ -30,4 +30,7 @@
   <ItemGroup>
     <None Include="Document\Note.md" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shader\SimpleVS.hlsl" />
+  </ItemGroup>
 </Project>

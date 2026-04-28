@@ -5,6 +5,8 @@
 #include <dxgi1_4.h>
 #include <wrl/client.h>
 
+#include <DirectXMath.h>
+
 #include <cassert>
 
 #pragma comment(lib, "d3d12.lib")
@@ -47,6 +49,14 @@ private:
     ComPtr<ID3D12DescriptorHeap> m_pHeapRTV;
     // フェンス
     ComPtr<ID3D12Fence> m_pFence;
+    // ディスクリプタヒープ
+    ComPtr<ID3D12DescriptorHeap> m_pHeapCBV;
+    // 頂点バッファ
+    ComPtr<ID3D12Resource> m_pVB;
+    // 定数バッファ
+    ComPtr<ID3D12RootSignature> m_pRootSignature;
+    // パイプラインステート
+    ComPtr<ID3D12PipelineState> m_pPSO;
     // フェンスイベント
     HANDLE m_FenceEvent;
     // フェンスカウンター
@@ -55,7 +65,16 @@ private:
 	uint32_t m_FrameIndex;
     // CPUディスクリプタ
 	D3D12_CPU_DESCRIPTOR_HANDLE m_HandleRTV[FrameCount];
-
+    // 頂点バッファビュー
+    D3D12_VERTEX_BUFFER_VIEW m_VBV;
+    // ビューポート
+    D3D12_VIEWPORT m_Viewport;
+	// シザー矩形
+    D3D12_RECT m_Scissor;
+    // 定数バッファビュー
+    ConstantBufferView<Transform> m_CBV[FrameCount];
+    // 回転角
+    float m_RotateAngle;
 
     bool InitApp();
     void TermApp();
