@@ -25,6 +25,9 @@
   <ItemGroup>
     <ClInclude Include="App\App.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Document\Note.md" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

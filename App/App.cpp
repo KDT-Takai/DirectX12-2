@@ -196,7 +196,7 @@ bool App::InitD3D()
         desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 		// スワップチェインの生成
         IDXGISwapChain* pSwapChain = nullptr;
-        hr = pFactory->CreateSwapChain(m_pQueue, &desc, &pSwapChain);
+        hr = pFactory->CreateSwapChain(m_pQueue.Get(), &desc, &pSwapChain);
         if (FAILED(hr))
         {
             SafeRelease(pFactory);
@@ -223,7 +223,7 @@ bool App::InitD3D()
         }
         // コマンドリストの生成
         {
-            hr = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCmdAllocator[m_FrameIndex], nullptr, IID_PPV_ARGS(&m_pCmdList));
+            hr = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCmdAllocator[m_FrameIndex].Get(), nullptr, IID_PPV_ARGS(&m_pCmdList));
             if (FAILED(hr))
             {
                 return false;
@@ -260,7 +260,7 @@ bool App::InitD3D()
             viewDesc.Texture2D.PlaneSlice = 0;
 
             // レンダーターゲットビューの生成
-            m_pDevice->CreateRenderTargetView(m_pColorBuffer[i], &viewDesc, handle);
+            m_pDevice->CreateRenderTargetView(m_pColorBuffer[i].Get(), &viewDesc, handle);
             m_HandleRTV[i] = handle;
             handle.ptr += incrementSize;
         }
@@ -335,7 +335,7 @@ void App::Render()
     D3D12_RESOURCE_BARRIER barrier = {};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    barrier.Transition.pResource = m_pColorBuffer[m_FrameIndex];
+    barrier.Transition.pResource = m_pColorBuffer[m_FrameIndex].Get();
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -354,7 +354,7 @@ void App::Render()
 	// リソースバリアの設定
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    barrier.Transition.pResource = m_pColorBuffer[m_FrameIndex];
+    barrier.Transition.pResource = m_pColorBuffer[m_FrameIndex].Get();
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -363,7 +363,7 @@ void App::Render()
     // コマンドの記録を終了
     m_pCmdList->Close();
     // コマンド実行
-    ID3D12CommandList* ppCmdLists[] = {m_pCmdList};
+    ID3D12CommandList* ppCmdLists[] = {m_pCmdList.Get()};
 	m_pQueue->ExecuteCommandLists(1, ppCmdLists);
 	// 画面に表示
 	Present(1);
@@ -376,7 +376,7 @@ void App::WaitGpu()
     assert(m_pFence != nullptr);
     assert(m_FenceEvent != nullptr);
 	// シグナル処理
-    m_pQueue->Signal(m_pFence, m_FenceCounter[m_FrameIndex]);
+    m_pQueue->Signal(m_pFence.Get(), m_FenceCounter[m_FrameIndex]);
     // 完了時にイベントを設定する
     m_pFence->SetEventOnCompletion(m_FenceCounter[m_FrameIndex], m_FenceEvent);
     // 待機処理
@@ -392,7 +392,7 @@ void App::Present(uint32_t interval)
     m_pSwapChain->Present(interval, 0);
     // シグナル処理
     const auto currentValue = m_FenceCounter[m_FrameIndex];
-    m_pQueue->Signal(m_pFence, currentValue);
+    m_pQueue->Signal(m_pFence.Get(), currentValue);
     // バックバッファ番号を更新
     m_FrameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
     // 次のフレームの描画準備がまだであれば待機
