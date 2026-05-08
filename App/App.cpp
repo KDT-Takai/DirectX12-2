@@ -86,7 +86,9 @@ bool App::InitWnd()
 
     // ウィンドウの登録
     if (!RegisterClassEx(&wc))
-    { return false; }
+    {
+        return false;
+    }
 
     // インスタンスハンドル設定
     m_hInst = hInst;
@@ -151,6 +153,10 @@ void App::MainLoop()
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+        }
+        else
+        {
+            Render();
         }
     }
 }
@@ -228,6 +234,8 @@ bool App::InitD3D()
             SafeRelease(pSwapChain);
             return false;
         }
+        // m_FrameIndexの初期化
+        m_FrameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
         // コマンドアロケータの生成
         {
             for (auto i = 0u; i < FrameCount; ++i)
@@ -373,7 +381,14 @@ void App::Render()
     // 描画処理
     {
         m_pCmdList->SetGraphicsRootSignature(m_pRootSignature.Get());
-//        m_pCmdList->SetDescriptorHeaps(1,m_HeapCBV.GetAddressOf());
+        m_pCmdList->SetDescriptorHeaps(1,m_pHeapCBV.GetAddressOf());
+        m_pCmdList->SetGraphicsRootConstantBufferView(0,m_CBV[m_FrameIndex].Desc.BufferLocation);
+        m_pCmdList->SetPipelineState(m_pPSO.Get());
+        m_pCmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_pCmdList->IASetVertexBuffers(0,1,&m_VBV);
+        m_pCmdList->RSSetViewports(1,&m_Viewport);
+        m_pCmdList->RSSetScissorRects(1,&m_Scissor);
+        m_pCmdList->DrawInstanced(3,1,0,0);
     }
 
 	// リソースバリアの設定
@@ -436,9 +451,13 @@ bool App::OnInit()
     {
         // 頂点データ
         Vertex vertices[] = {
-            {DirectX::XMFLOAT3(-1.0f,-1.0f,0.0f),DirectX::XMFLOAT4(0.0f,0.0f,1.0f,1.0f)},
-            {DirectX::XMFLOAT3(1.0f,-1.0f,0.0f),DirectX::XMFLOAT4(0.0f,1.0f,0.0f,1.0f)},
-            {DirectX::XMFLOAT3(0.0f,1.0f,0.0f),DirectX::XMFLOAT4(1.0f,0.0f,0.0f,1.0f)},
+            //{DirectX::XMFLOAT3(-1.0f,-1.0f,0.0f),DirectX::XMFLOAT4(0.0f,0.0f,1.0f,1.0f)},
+            //{DirectX::XMFLOAT3(1.0f,-1.0f,0.0f),DirectX::XMFLOAT4(0.0f,1.0f,0.0f,1.0f)},
+            //{DirectX::XMFLOAT3(0.0f,1.0f,0.0f),DirectX::XMFLOAT4(1.0f,0.0f,0.0f,1.0f)},
+            {DirectX::XMFLOAT3(-1.0f,1.0f,0.0f),DirectX::XMFLOAT4(1.0f,0.0f,0.0f,1.0f)},
+            {DirectX::XMFLOAT3(1.0f,1.0f,0.0f),DirectX::XMFLOAT4(0.0f,1.0f,0.0f,1.0f)},
+            {DirectX::XMFLOAT3(1.0f,-1.0f,0.0f),DirectX::XMFLOAT4(0.0f,0.0f,1.0f,1.0f)},
+            {DirectX::XMFLOAT3(-1.0f,-1.0f,0.0f),DirectX::XMFLOAT4(1.0f,0.0f,1.0f,1.0f)},
         };
         // ヒーププロパティ
         D3D12_HEAP_PROPERTIES prop = {};
@@ -485,7 +504,7 @@ bool App::OnInit()
         m_pVB->Unmap(0,nullptr);
 		// 頂点バッファビューの設定
         m_VBV.BufferLocation = m_pVB->GetGPUVirtualAddress();
-        m_VBV.SizeInBytes = static_cast<UINT>(sizeof(Vertex));
+        m_VBV.SizeInBytes = static_cast<UINT>(sizeof(vertices));
         m_VBV.StrideInBytes = static_cast<UINT>(sizeof(Vertex));
     }
     // 定数バッファ用ディスクリプタヒープの生成
@@ -503,6 +522,8 @@ bool App::OnInit()
     }
     // 定数バッファの生成
     {
+        uint32_t indices[] = {0,1,2,0,2,3};
+
 		// ヒーププロパティ
         D3D12_HEAP_PROPERTIES prop = {};
         prop.Type = D3D12_HEAP_TYPE_UPLOAD;
