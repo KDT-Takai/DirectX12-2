@@ -4,15 +4,32 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <wrl/client.h>
-
+#include <d3dcompiler.h>
 #include <DirectXMath.h>
 
 #include <cassert>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment( lib, "d3dcompiler.lib" )
 
 template <typename T>using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+struct alignas(256) Transform
+{
+    DirectX::XMMATRIX   World;      // ワールド行列
+    DirectX::XMMATRIX   View;       // ビュー行列
+    DirectX::XMMATRIX   Proj;       // 射影行列
+};
+
+template<typename T>
+struct ConstantBufferView
+{
+    D3D12_CONSTANT_BUFFER_VIEW_DESC Desc;               // 定数バッファの構成設定
+    D3D12_CPU_DESCRIPTOR_HANDLE     HandleCPU;          // CPUディスクリプタハンドル
+    D3D12_GPU_DESCRIPTOR_HANDLE     HandleGPU;          // GPUディスクリプタハンドル
+    T* pBuffer;            // バッファ先頭へのポインタ
+};
 
 class App
 {
@@ -54,6 +71,8 @@ private:
     // 頂点バッファ
     ComPtr<ID3D12Resource> m_pVB;
     // 定数バッファ
+    ComPtr<ID3D12Resource> m_pCB[FrameCount];
+    // ルートシグニチャ
     ComPtr<ID3D12RootSignature> m_pRootSignature;
     // パイプラインステート
     ComPtr<ID3D12PipelineState> m_pPSO;
@@ -86,6 +105,8 @@ private:
     void Render();
     void WaitGpu();
     void Present(uint32_t interval);
+    bool OnInit();
+    void OnTerm();
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 };
