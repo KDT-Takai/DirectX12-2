@@ -52,6 +52,7 @@ private:
     uint32_t m_Width;
     // ウィンドウの縦幅
     uint32_t m_Height;
+
     // デバイス
     ComPtr<ID3D12Device> m_pDevice;
     // コマンドキュー
@@ -72,8 +73,10 @@ private:
     ComPtr<ID3D12DescriptorHeap> m_pHeapCBV;
     // 頂点バッファ
     ComPtr<ID3D12Resource> m_pVB;
+    // インデックスバッファ
+	ComPtr<ID3D12Resource> m_pIB;
     // 定数バッファ
-    ComPtr<ID3D12Resource> m_pCB[FrameCount];
+    ComPtr<ID3D12Resource> m_pCB[FrameCount*2];
     // ルートシグニチャ
     ComPtr<ID3D12RootSignature> m_pRootSignature;
     // パイプラインステート
@@ -88,12 +91,14 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE m_HandleRTV[FrameCount];
     // 頂点バッファビュー
     D3D12_VERTEX_BUFFER_VIEW m_VBV;
+    // インデックスバッファビュー
+    D3D12_INDEX_BUFFER_VIEW m_IBV;
     // ビューポート
     D3D12_VIEWPORT m_Viewport;
 	// シザー矩形
     D3D12_RECT m_Scissor;
     // 定数バッファビュー
-    ConstantBufferView<Transform> m_CBV[FrameCount];
+    ConstantBufferView<Transform> m_CBV[FrameCount*2];
     // 回転角
     float m_RotateAngle;
 
