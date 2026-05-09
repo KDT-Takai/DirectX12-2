@@ -41,16 +41,19 @@ bool App::InitApp()
     // ウィンドウの初期化
     if (!InitWnd())
     {
+        LOG_CRITICAL("ウィンドウの初期化に失敗");
         return false;
     }
     // Direct3D12の初期化
     if (!InitD3D())
     {
+        LOG_CRITICAL("DirectX12の初期化に失敗");
         return false;
     }
 
     if (!OnInit())
     {
+		LOG_CRITICAL("アプリケーションの初期化に失敗");
         return false;
     }
 
@@ -69,6 +72,7 @@ bool App::InitWnd()
     auto hInst = GetModuleHandle(nullptr);
     if (hInst == nullptr)
     {
+		LOG_CRITICAL("インスタンスハンドルの取得に失敗");
         return false;
     }
 
@@ -87,6 +91,7 @@ bool App::InitWnd()
     // ウィンドウの登録
     if (!RegisterClassEx(&wc))
     {
+        LOG_CRITICAL("ウィンドウの登録に失敗");
         return false;
     }
 
@@ -118,7 +123,10 @@ bool App::InitWnd()
         nullptr);
 
     if (m_hWnd == nullptr)
-    { return false; }
+    {
+        LOG_CRITICAL("ウィンドウの生成に失敗");
+        return false;
+    }
  
     // ウィンドウを表示
     ShowWindow(m_hWnd, SW_SHOWNORMAL);
@@ -179,6 +187,7 @@ bool App::InitD3D()
     auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(m_pDevice.GetAddressOf()));
     if (FAILED(hr))
     {
+        LOG_CRITICAL("デバイスの初期化に失敗");
         return false;
     }
 	// コマンドキューの生成
@@ -190,6 +199,7 @@ bool App::InitD3D()
 	hr = m_pDevice->CreateCommandQueue(&desc, IID_PPV_ARGS(&m_pQueue));
     if (FAILED(hr))
     {
+        LOG_CRITICAL("コマンドキューの生成に失敗");
         return false;
     }
 	// スワップチェインの生成
@@ -199,6 +209,7 @@ bool App::InitD3D()
         hr = CreateDXGIFactory1(IID_PPV_ARGS(&pFactory));
         if (FAILED(hr))
         {
+            LOG_CRITICAL("DXGIファクトリーの生成に失敗");
             return false;
 		}
         // スワップチェインの生成
@@ -223,6 +234,7 @@ bool App::InitD3D()
         hr = pFactory->CreateSwapChain(m_pQueue.Get(), &desc, &pSwapChain);
         if (FAILED(hr))
         {
+            LOG_CRITICAL("スワップチェインの生成に失敗");
             SafeRelease(pFactory);
             return false;
         }
@@ -230,6 +242,7 @@ bool App::InitD3D()
         hr = pSwapChain->QueryInterface(IID_PPV_ARGS(&m_pSwapChain));
         if (FAILED(hr))
         {
+            LOG_CRITICAL("IDXGISwapChain3の取得に失敗");
             SafeRelease(pFactory);
             SafeRelease(pSwapChain);
             return false;
@@ -243,6 +256,7 @@ bool App::InitD3D()
                 hr = m_pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_pCmdAllocator[i]));
                 if (FAILED(hr))
                 {
+                    LOG_CRITICAL("コマンドアロケータの生成に失敗");
                     return false;
                 }
             }
@@ -252,6 +266,7 @@ bool App::InitD3D()
             hr = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCmdAllocator[m_FrameIndex].Get(), nullptr, IID_PPV_ARGS(&m_pCmdList));
             if (FAILED(hr))
             {
+                LOG_CRITICAL("コマンドリストの生成に失敗");
                 return false;
             }
         }
@@ -267,6 +282,7 @@ bool App::InitD3D()
             hr = m_pDevice->CreateDescriptorHeap(&desc,IID_PPV_ARGS(&m_pHeapRTV));
             if (FAILED(hr))
             {
+				LOG_CRITICAL("ディスクリプタヒープの生成に失敗");
                 return false;
             }
         }
@@ -277,6 +293,7 @@ bool App::InitD3D()
             hr = m_pSwapChain->GetBuffer(i, IID_PPV_ARGS(&m_pColorBuffer[i]));
             if (FAILED(hr))
             {
+				LOG_CRITICAL("バックバッファの取得に失敗");
                 return false;
 			}
             D3D12_RENDER_TARGET_VIEW_DESC viewDesc = {};
@@ -302,6 +319,7 @@ bool App::InitD3D()
         hr = m_pDevice->CreateFence(m_FenceCounter[m_FrameIndex],D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_pFence));
         if (FAILED(hr))
         {
+			LOG_CRITICAL("フェンスの生成に失敗");
             return false;
         }
 		m_FenceCounter[m_FrameIndex]++;
@@ -310,6 +328,7 @@ bool App::InitD3D()
 		m_FenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
         if (m_FenceEvent == nullptr)
         {
+			LOG_CRITICAL("イベントの生成に失敗");
             return false;
         }
         // コマンドリスト
@@ -489,6 +508,7 @@ bool App::OnInit()
             IID_PPV_ARGS(m_pVB.GetAddressOf()));
         if (FAILED(hr))
         {
+            LOG_CRITICAL("頂点バッファの生成に失敗");
             return false;
         }
         // マッピング
@@ -496,6 +516,7 @@ bool App::OnInit()
         hr = m_pVB->Map(0,nullptr,&ptr);
         if (FAILED(hr))
         {
+			LOG_CRITICAL("頂点バッファのマッピングに失敗");
             return false;
         }
         // 頂点データをマッピング先に設定
@@ -517,6 +538,7 @@ bool App::OnInit()
         auto hr = m_pDevice->CreateDescriptorHeap(&desc,IID_PPV_ARGS(m_pHeapCBV.GetAddressOf()));
         if (FAILED(hr))
         {
+			LOG_CRITICAL("定数バッファ用ディスクリプタヒープの生成に失敗");
             return false;
 		}
     }
@@ -557,6 +579,7 @@ bool App::OnInit()
                 IID_PPV_ARGS(m_pCB[i].GetAddressOf()));
             if (FAILED(hr))
             {
+				LOG_CRITICAL("定数バッファの生成に失敗");
                 return false;
             }
             auto address = m_pCB[i]->GetGPUVirtualAddress();
@@ -575,6 +598,7 @@ bool App::OnInit()
             hr = m_pCB[i]->Map(0, nullptr, reinterpret_cast<void**>(&m_CBV[i].pBuffer));
             if (FAILED(hr))
             {
+				LOG_CRITICAL("定数バッファのマッピングに失敗");
                 return false;
             }
             auto eyePos = DirectX::XMVectorSet(0.0f,0.0f,5.0f,0.0f);
@@ -620,6 +644,10 @@ bool App::OnInit()
             pErrorBlob.GetAddressOf());
         if (FAILED(hr))
         {
+            if (pErrorBlob != nullptr)
+            {
+                LOG_ERROR("ルートシグニチャのシリアライズに失敗: {0}", static_cast<char*>(pErrorBlob->GetBufferPointer()));
+			}
             return false;
         }
 
@@ -631,6 +659,7 @@ bool App::OnInit()
             IID_PPV_ARGS(m_pRootSignature.GetAddressOf()));
         if (FAILED(hr))
         {
+			LOG_CRITICAL("ルートシグニチャの生成に失敗");
             return false;
         }
     }
@@ -694,6 +723,7 @@ bool App::OnInit()
         auto hr = D3DReadFileToBlob(L"VertexShader.cso", pVSBlob.GetAddressOf());
         if (FAILED(hr))
         {
+            LOG_CRITICAL("頂点シェーダの読み込みに失敗");
             return false;
         }
 
@@ -701,6 +731,7 @@ bool App::OnInit()
         hr = D3DReadFileToBlob(L"PixelShader.cso", pPSBlob.GetAddressOf());
         if (FAILED(hr))
         {
+			LOG_CRITICAL("ピクセルシェーダの読み込みに失敗");
             return false;
         }
 
@@ -728,6 +759,7 @@ bool App::OnInit()
             IID_PPV_ARGS(m_pPSO.GetAddressOf()));
         if (FAILED(hr))
         {
+			LOG_CRITICAL("パイプラインステートの生成に失敗");
             return false;
         }
     }
