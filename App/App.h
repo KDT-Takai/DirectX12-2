@@ -13,6 +13,8 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment( lib, "d3dcompiler.lib" )
 
+#include "../Log/Log.hpp"
+
 template <typename T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 struct alignas(256) Transform
