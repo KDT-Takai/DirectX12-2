@@ -27,4 +27,10 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Document\Note.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shader\SimpleVS.hlsl" />
+  </ItemGroup>
 </Project>

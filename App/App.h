@@ -3,9 +3,33 @@
 #include <cstdint>
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <wrl/client.h>
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
+
+#include <cassert>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment( lib, "d3dcompiler.lib" )
+
+template <typename T>using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+struct alignas(256) Transform
+{
+    DirectX::XMMATRIX   World;      // ワールド行列
+    DirectX::XMMATRIX   View;       // ビュー行列
+    DirectX::XMMATRIX   Proj;       // 射影行列
+};
+
+template<typename T>
+struct ConstantBufferView
+{
+    D3D12_CONSTANT_BUFFER_VIEW_DESC Desc;               // 定数バッファの構成設定
+    D3D12_CPU_DESCRIPTOR_HANDLE     HandleCPU;          // CPUディスクリプタハンドル
+    D3D12_GPU_DESCRIPTOR_HANDLE     HandleGPU;          // GPUディスクリプタハンドル
+    T* pBuffer;            // バッファ先頭へのポインタ
+};
 
 class App
 {
@@ -27,27 +51,49 @@ private:
     // ウィンドウの縦幅
     uint32_t m_Height;
     // デバイス
-    ID3D12Device* m_pDevice;
+    ComPtr<ID3D12Device> m_pDevice;
     // コマンドキュー
-    ID3D12CommandQueue* m_pQueue;
+    ComPtr<ID3D12CommandQueue> m_pQueue;
     // スワップチェイン
-	IDXGISwapChain3* m_pSwapChain;
+    ComPtr<IDXGISwapChain3> m_pSwapChain;
     // カラーバッファ
-	ID3D12Resource* m_pColorBuffer[FrameCount];
+    ComPtr<ID3D12Resource> m_pColorBuffer[FrameCount];
+    // コマンドアロケータ
+    ComPtr<ID3D12CommandAllocator> m_pCmdAllocator[FrameCount];
     // コマンドリスト
-	ID3D12GraphicsCommandList* m_pCmdList;
+    ComPtr<ID3D12GraphicsCommandList> m_pCmdList;
     // ディスクリプタヒープ
-    ID3D12DescriptorHeap* m_pHeapRTV;
+    ComPtr<ID3D12DescriptorHeap> m_pHeapRTV;
     // フェンス
-	ID3D12Fence* m_pFence;
+    ComPtr<ID3D12Fence> m_pFence;
+    // ディスクリプタヒープ
+    ComPtr<ID3D12DescriptorHeap> m_pHeapCBV;
+    // 頂点バッファ
+    ComPtr<ID3D12Resource> m_pVB;
+    // 定数バッファ
+    ComPtr<ID3D12Resource> m_pCB[FrameCount];
+    // ルートシグニチャ
+    ComPtr<ID3D12RootSignature> m_pRootSignature;
+    // パイプラインステート
+    ComPtr<ID3D12PipelineState> m_pPSO;
     // フェンスイベント
     HANDLE m_FenceEvent;
-    // フェンスカウント
-	uint64_t m_FenceCount[FrameCount];
+    // フェンスカウンター
+	uint64_t m_FenceCounter[FrameCount];
     // フレーム番号
 	uint32_t m_FrameIndex;
     // CPUディスクリプタ
 	D3D12_CPU_DESCRIPTOR_HANDLE m_HandleRTV[FrameCount];
+    // 頂点バッファビュー
+    D3D12_VERTEX_BUFFER_VIEW m_VBV;
+    // ビューポート
+    D3D12_VIEWPORT m_Viewport;
+	// シザー矩形
+    D3D12_RECT m_Scissor;
+    // 定数バッファビュー
+    ConstantBufferView<Transform> m_CBV[FrameCount];
+    // 回転角
+    float m_RotateAngle;
 
     bool InitApp();
     void TermApp();
@@ -59,6 +105,8 @@ private:
     void Render();
     void WaitGpu();
     void Present(uint32_t interval);
+    bool OnInit();
+    void OnTerm();
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 };
