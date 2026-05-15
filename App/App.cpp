@@ -745,7 +745,7 @@ bool App::OnInit()
 
         elements[1].SemanticName = "TEXCOORD";
         elements[1].SemanticIndex = 0;
-        elements[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+        elements[1].Format = DXGI_FORMAT_R32G32_FLOAT;
         elements[1].InputSlot = 0;
         elements[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
         elements[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
@@ -775,7 +775,7 @@ bool App::OnInit()
         };
 
         // ブレンドステートの設定
-        D3D12_BLEND_DESC descBS;
+        D3D12_BLEND_DESC descBS = {};
         descBS.AlphaToCoverageEnable = FALSE;
         descBS.IndependentBlendEnable = FALSE;
         for (UINT i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
@@ -839,7 +839,7 @@ bool App::OnInit()
         desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
         desc.NumRenderTargets = 1;
         desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-        desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+        desc.DSVFormat = DXGI_FORMAT_UNKNOWN;
         desc.SampleDesc.Count = 1;
         desc.SampleDesc.Quality = 0;
 
@@ -860,7 +860,10 @@ bool App::OnInit()
         std::wstring texturePath;
         // TODO: 自分用のファイルに切り替え
         if (!SearchFilePath(L"res/SampleTexture.dds", texturePath))
-        { return false; }
+        {
+			LOG_CRITICAL("テクスチャのファイルパスの検索に失敗");
+            return false;
+        }
         DirectX::ResourceUploadBatch batch(m_pDevice.Get());
 		batch.Begin();
         // リソースを生成
@@ -887,7 +890,7 @@ bool App::OnInit()
         auto handleGPU = m_pHeapCBV_SRV_UAV->GetGPUDescriptorHandleForHeapStart();
         // テクスチャにディスクリプタを割り当て
         handleCPU.ptr += incrementSize * 2;
-        handleGPU.ptr += incrementSize + 2;
+        handleGPU.ptr += incrementSize * 2;
         
         m_Texture.HandleCPU = handleCPU;
 		m_Texture.HandleGPU = handleGPU;
@@ -928,6 +931,34 @@ bool App::OnInit()
 
 void App::OnTerm()
 {
+    for (auto i = 0; i < FrameCount; ++i)
+    {
+        if (m_pCB[i].Get() != nullptr)
+        {
+            m_pCB[i]->Unmap(0, nullptr);
+            memset(&m_CBV[i], 0, sizeof(m_CBV[i]));
+        }
+        m_pCB[i].Reset();
+    }
+
+    m_pIB.Reset();
+    m_pVB.Reset();
+    m_pPSO.Reset();
+    m_pHeapCBV_SRV_UAV.Reset();
+
+    m_VBV.BufferLocation = 0;
+    m_VBV.SizeInBytes = 0;
+    m_VBV.StrideInBytes = 0;
+
+    m_IBV.BufferLocation = 0;
+    m_IBV.Format = DXGI_FORMAT_UNKNOWN;
+    m_IBV.SizeInBytes = 0;
+
+    m_pRootSignature.Reset();
+
+    m_Texture.pResource.Reset();
+    m_Texture.HandleCPU.ptr = 0;
+    m_Texture.HandleGPU.ptr = 0;
 }
 
 void App::MainLoop()
@@ -953,8 +984,9 @@ void App::Render()
     // 更新処理
     {
         m_RotateAngle += 0.025f;
-        m_CBV[m_FrameIndex*2+0].pBuffer->World = DirectX::XMMatrixRotationZ(m_RotateAngle + DirectX::XMConvertToRadians(45.0f));
-        m_CBV[m_FrameIndex*2+1].pBuffer->World = DirectX::XMMatrixRotationY(m_RotateAngle) * DirectX::XMMatrixScaling(2.0f,0.5f,1.0f);
+		m_CBV[m_FrameIndex].pBuffer->World = DirectX::XMMatrixRotationY(m_RotateAngle);
+        //m_CBV[m_FrameIndex*2+0].pBuffer->World = DirectX::XMMatrixRotationZ(m_RotateAngle + DirectX::XMConvertToRadians(45.0f));
+        //m_CBV[m_FrameIndex*2+1].pBuffer->World = DirectX::XMMatrixRotationY(m_RotateAngle) * DirectX::XMMatrixScaling(2.0f,0.5f,1.0f);
     }
     // コマンドの記録を開始
 	m_pCmdAllocator[m_FrameIndex]->Reset();
@@ -970,17 +1002,20 @@ void App::Render()
     // リソースバリア
     m_pCmdList->ResourceBarrier(1, &barrier);
     // レンダーターゲットの設定
-    m_pCmdList->OMSetRenderTargets(1,&m_HandleRTV[m_FrameIndex], FALSE, &m_HandleDSV);
+//    m_pCmdList->OMSetRenderTargets(1,&m_HandleRTV[m_FrameIndex], FALSE, &m_HandleDSV);
+    m_pCmdList->OMSetRenderTargets(1,&m_HandleRTV[m_FrameIndex], FALSE, nullptr);
     // クリアカラーの設定
     float clearColor[] = { 0.25f,0.25f,0.25f,1.0f };
     // レンダーターゲットビューをクリア
     m_pCmdList->ClearRenderTargetView(m_HandleRTV[m_FrameIndex], clearColor, 0, nullptr);
     // 深度ステンシルビューをクリア.
-    m_pCmdList->ClearDepthStencilView(m_HandleDSV, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+//    m_pCmdList->ClearDepthStencilView(m_HandleDSV, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
     // 描画処理
     {
         m_pCmdList->SetGraphicsRootSignature(m_pRootSignature.Get());
         m_pCmdList->SetDescriptorHeaps(1, m_pHeapCBV_SRV_UAV.GetAddressOf());
+        m_pCmdList->SetGraphicsRootConstantBufferView(0, m_CBV[m_FrameIndex].Desc.BufferLocation);
+        m_pCmdList->SetGraphicsRootDescriptorTable(1, m_Texture.HandleGPU);
         m_pCmdList->SetPipelineState(m_pPSO.Get());
         m_pCmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_pCmdList->IASetVertexBuffers(0,1,&m_VBV);
@@ -988,10 +1023,10 @@ void App::Render()
         m_pCmdList->RSSetViewports(1,&m_Viewport);
         m_pCmdList->RSSetScissorRects(1,&m_Scissor);
         // m_pCmdList->DrawInstanced(6,1,0,0);
-        m_pCmdList->SetGraphicsRootConstantBufferView(0, m_CBV[m_FrameIndex * 2 + 0].Desc.BufferLocation);
-        m_pCmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+        //m_pCmdList->SetGraphicsRootConstantBufferView(0, m_CBV[m_FrameIndex * 2 + 0].Desc.BufferLocation);
+        //m_pCmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-        m_pCmdList->SetGraphicsRootConstantBufferView(0, m_CBV[m_FrameIndex * 2 + 1].Desc.BufferLocation);
+        //m_pCmdList->SetGraphicsRootConstantBufferView(0, m_CBV[m_FrameIndex * 2 + 1].Desc.BufferLocation);
         m_pCmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
     }
 

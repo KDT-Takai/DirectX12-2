@@ -31,7 +31,7 @@ struct VSInput
 // テクスチャを使用する頂点シェーダーの出力構造体
 struct VSOutput
 {
-    float4 Position : POSITION; // 位置座標
+    float4 Position : SV_Position; // 位置座標
     float2 TexCoord : TEXCOORD0; // テクスチャ座標
 };
 

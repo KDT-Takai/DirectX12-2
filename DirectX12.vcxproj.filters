@@ -46,8 +46,8 @@
     <None Include="Tools\texconv.exe" />
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
-    <None Include="PixelShader.cso" />
     <None Include="README.md" />
+    <None Include="PixelShader.cso" />
     <None Include="VertexShader.cso" />
   </ItemGroup>
   <ItemGroup>
