@@ -61,14 +61,18 @@ private:
     ComPtr<IDXGISwapChain3> m_pSwapChain;
     // カラーバッファ
     ComPtr<ID3D12Resource> m_pColorBuffer[FrameCount];
+	// 深度バッファ
+	ComPtr<ID3D12Resource> m_pDepthBuffer;
     // コマンドアロケータ
     ComPtr<ID3D12CommandAllocator> m_pCmdAllocator[FrameCount];
     // コマンドリスト
     ComPtr<ID3D12GraphicsCommandList> m_pCmdList;
-    // ディスクリプタヒープ
+    // ディスクリプタヒープ(レンダーターゲットビュー)
     ComPtr<ID3D12DescriptorHeap> m_pHeapRTV;
     // フェンス
     ComPtr<ID3D12Fence> m_pFence;
+    // ディスクリプタヒープ(深度ステンシルビュー)
+    ComPtr<ID3D12DescriptorHeap> m_pHeapDSV;
     // ディスクリプタヒープ
     ComPtr<ID3D12DescriptorHeap> m_pHeapCBV;
     // 頂点バッファ
@@ -87,8 +91,10 @@ private:
 	uint64_t m_FenceCounter[FrameCount];
     // フレーム番号
 	uint32_t m_FrameIndex;
-    // CPUディスクリプタ
+    // CPUディスクリプタ(レンダーターゲットビュー)
 	D3D12_CPU_DESCRIPTOR_HANDLE m_HandleRTV[FrameCount];
+    // CPUディスクリプタ(深度ステンシルビュー)
+    D3D12_CPU_DESCRIPTOR_HANDLE m_HandleDSV;
     // 頂点バッファビュー
     D3D12_VERTEX_BUFFER_VIEW m_VBV;
     // インデックスバッファビュー
