@@ -13,7 +13,7 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment( lib, "d3dcompiler.lib" )
 
-#include "../Log/Log.hpp"
+#include "../Logger/Logger.hpp"
 
 template <typename T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 
@@ -52,6 +52,7 @@ private:
     uint32_t m_Width;
     // ウィンドウの縦幅
     uint32_t m_Height;
+
     // デバイス
     ComPtr<ID3D12Device> m_pDevice;
     // コマンドキュー
@@ -60,20 +61,26 @@ private:
     ComPtr<IDXGISwapChain3> m_pSwapChain;
     // カラーバッファ
     ComPtr<ID3D12Resource> m_pColorBuffer[FrameCount];
+	// 深度バッファ
+	ComPtr<ID3D12Resource> m_pDepthBuffer;
     // コマンドアロケータ
     ComPtr<ID3D12CommandAllocator> m_pCmdAllocator[FrameCount];
     // コマンドリスト
     ComPtr<ID3D12GraphicsCommandList> m_pCmdList;
-    // ディスクリプタヒープ
+    // ディスクリプタヒープ(レンダーターゲットビュー)
     ComPtr<ID3D12DescriptorHeap> m_pHeapRTV;
     // フェンス
     ComPtr<ID3D12Fence> m_pFence;
+    // ディスクリプタヒープ(深度ステンシルビュー)
+    ComPtr<ID3D12DescriptorHeap> m_pHeapDSV;
     // ディスクリプタヒープ
     ComPtr<ID3D12DescriptorHeap> m_pHeapCBV;
     // 頂点バッファ
     ComPtr<ID3D12Resource> m_pVB;
+    // インデックスバッファ
+	ComPtr<ID3D12Resource> m_pIB;
     // 定数バッファ
-    ComPtr<ID3D12Resource> m_pCB[FrameCount];
+    ComPtr<ID3D12Resource> m_pCB[FrameCount*2];
     // ルートシグニチャ
     ComPtr<ID3D12RootSignature> m_pRootSignature;
     // パイプラインステート
@@ -84,16 +91,20 @@ private:
 	uint64_t m_FenceCounter[FrameCount];
     // フレーム番号
 	uint32_t m_FrameIndex;
-    // CPUディスクリプタ
+    // CPUディスクリプタ(レンダーターゲットビュー)
 	D3D12_CPU_DESCRIPTOR_HANDLE m_HandleRTV[FrameCount];
+    // CPUディスクリプタ(深度ステンシルビュー)
+    D3D12_CPU_DESCRIPTOR_HANDLE m_HandleDSV;
     // 頂点バッファビュー
     D3D12_VERTEX_BUFFER_VIEW m_VBV;
+    // インデックスバッファビュー
+    D3D12_INDEX_BUFFER_VIEW m_IBV;
     // ビューポート
     D3D12_VIEWPORT m_Viewport;
 	// シザー矩形
     D3D12_RECT m_Scissor;
     // 定数バッファビュー
-    ConstantBufferView<Transform> m_CBV[FrameCount];
+    ConstantBufferView<Transform> m_CBV[FrameCount*2];
     // 回転角
     float m_RotateAngle;
 

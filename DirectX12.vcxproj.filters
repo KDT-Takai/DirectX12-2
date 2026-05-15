@@ -21,16 +21,25 @@
     <ClCompile Include="App\App.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Log\Log.hpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\App.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Logger\Logger.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Document\Note.md" />
+    <None Include="Shader\ShaderCommon.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shader\SimpleVS.hlsl" />
+    <FxCompile Include="Shader\PixelShader.hlsl" />
+    <FxCompile Include="Shader\VertexShader.hlsl" />
   </ItemGroup>
 </Project>

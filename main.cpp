@@ -5,7 +5,7 @@
 // Application
 #include "App/App.h"
 // log
-#include "Log/Log.hpp"
+#include "Logger/Logger.hpp"
 
 int wmain(int argc, wchar_t** argv, wchar_t** evnp)
 {

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\App.cpp" />
+    <ClCompile Include="Logger\Logger.hpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Document\Note.md" />
+    <None Include="packages.config" />
     <None Include="Shader\ShaderCommon.hlsli" />
   </ItemGroup>
   <ItemGroup>
@@ -162,5 +164,12 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\directxtk12_desktop_win10.2026.5.8.1\build\native\directxtk12_desktop_win10.targets" Condition="Exists('packages\directxtk12_desktop_win10.2026.5.8.1\build\native\directxtk12_desktop_win10.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\directxtk12_desktop_win10.2026.5.8.1\build\native\directxtk12_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\directxtk12_desktop_win10.2026.5.8.1\build\native\directxtk12_desktop_win10.targets'))" />
+  </Target>
 </Project>
