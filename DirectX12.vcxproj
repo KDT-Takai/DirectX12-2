@@ -20,17 +20,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\App.cpp" />
+    <ClCompile Include="FileUtil\FileUtil.cpp" />
     <ClCompile Include="Logger\Logger.hpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\App.h" />
+    <ClInclude Include="FileUtil\FileUtil.hpp" />
     <ClInclude Include="Log\Log.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
     <None Include="Document\Note.md" />
     <None Include="packages.config" />
+    <None Include="PixelShader.cso" />
+    <None Include="README.md" />
     <None Include="Shader\ShaderCommon.hlsli" />
+    <None Include="Tools\texconv.exe" />
+    <None Include="VertexShader.cso" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\PixelShader.hlsl">
@@ -49,6 +57,10 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Textures\SampleTexture.bmp" />
+    <Image Include="Tools\SampleTexture.bmp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

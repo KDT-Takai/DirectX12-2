@@ -13,3 +13,17 @@ _CtrSetBreakAlloc(148); // 148は、何回目にメモリを確保したときにブレークするかを
 
 システム値セマンティックの詳細
 https://learn.microsoft.com/ja-jp/windows/win32/direct3dhlsl/dx-graphics-hlsl-semantics?redirectedfrom=MSDN
+
+クラス構成
+window
+device
+rendering
+log
+
+#define NOMINMAXで消せる
+
+#ifdef PCH_H
+#define PCH_H
+
+#ifdef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN

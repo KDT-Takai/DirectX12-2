@@ -8,15 +8,34 @@ cbuffer Transform : register(b0)
 }
 
 // 頂点シェーダーの入力構造体
+//struct VSInput
+//{
+//    float3 Position : POSITION; // 位置座標
+//    float4 Color : COLOR; // 頂点カラー
+//};
+
+// 頂点シェーダーの出力構造体
+//struct VSOutput
+//{
+//    float4 Position : SV_Position; // 位置座標
+//    float4 Color : COLOR; // 頂点カラー
+//};
+
+// テクスチャを使用する頂点シェーダーの入力構造体
 struct VSInput
 {
     float3 Position : POSITION; // 位置座標
-    float4 Color : COLOR; // 頂点カラー
+    float2 TexCoord : TEXCOORD0; // テクスチャ座標
 };
 
-// 頂点シェーダーの出力構造体
+// テクスチャを使用する頂点シェーダーの出力構造体
 struct VSOutput
 {
-    float4 Position : SV_Position; // 位置座標
-    float4 Color : COLOR; // 頂点カラー
+    float4 Position : POSITION; // 位置座標
+    float2 TexCoord : TEXCOORD0; // テクスチャ座標
+};
+
+struct PSOutput
+{
+    float4 Color : SV_TARGET0; // ピクセルカラー
 };
