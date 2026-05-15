@@ -47,6 +47,7 @@ void App::Run()
 
 bool App::InitApp()
 {
+    LOG_INFO("初期化開始");
     // ウィンドウの初期化
     if (!InitWnd())
     {

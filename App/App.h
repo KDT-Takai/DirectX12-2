@@ -13,7 +13,7 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment( lib, "d3dcompiler.lib" )
 
-#include "../Log/Log.hpp"
+#include "../Logger/Logger.hpp"
 
 template <typename T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 
