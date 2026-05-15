@@ -47,7 +47,6 @@ void App::Run()
 
 bool App::InitApp()
 {
-    LOG_INFO("初期化開始");
     // ウィンドウの初期化
     if (!InitWnd())
     {
@@ -430,6 +429,60 @@ bool App::OnInit()
         m_VBV.BufferLocation = m_pVB->GetGPUVirtualAddress();
         m_VBV.SizeInBytes = static_cast<UINT>(sizeof(vertices));
         m_VBV.StrideInBytes = static_cast<UINT>(sizeof(Vertex));
+    }
+    // インデックスバッファの生成
+    {
+        uint32_t indices[] = { 0,1,2,0,2,3 };
+        // ヒーププロパティ
+        D3D12_HEAP_PROPERTIES prop = {};
+        prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+        prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        prop.CreationNodeMask = 1;
+        prop.VisibleNodeMask = 1;
+        // リソースの設定
+        D3D12_RESOURCE_DESC desc = {};
+        desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        desc.Alignment = 0;
+        desc.Width = sizeof(indices);
+        desc.Height = 1;
+        desc.DepthOrArraySize = 1;
+        desc.MipLevels = 1;
+        desc.Format = DXGI_FORMAT_UNKNOWN;
+        desc.SampleDesc.Count = 1;
+        desc.SampleDesc.Quality = 0;
+        desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+        // リソース生成
+        auto hr = m_pDevice->CreateCommittedResource(
+            &prop,
+            D3D12_HEAP_FLAG_NONE,
+            &desc,
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS(m_pIB.GetAddressOf())
+        );
+        if (FAILED(hr))
+        {
+            LOG_CRITICAL("インデックスバッファの生成に失敗");
+            return false;
+        }
+        // マッピング
+        void* ptr = nullptr;
+        hr = m_pIB->Map(0, nullptr, &ptr);
+        if (FAILED(hr))
+        {
+            LOG_CRITICAL("インデックスバッファのマッピングに失敗");
+            return false;
+        }
+        // インデックスデータをマッピング先に設定
+        memcpy(ptr, indices, sizeof(indices));
+        // マッピング解除
+        m_pIB->Unmap(0,nullptr);
+		// インデックスバッファビューの設定
+        m_IBV.BufferLocation = m_pIB->GetGPUVirtualAddress();
+        m_IBV.Format = DXGI_FORMAT_R32_UINT;
+        m_IBV.SizeInBytes = sizeof(indices);
     }
     // 定数バッファ用ディスクリプタヒープの生成
     {
