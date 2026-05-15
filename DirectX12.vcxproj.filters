@@ -36,6 +36,7 @@
   <ItemGroup>
     <None Include="Document\Note.md" />
     <None Include="Shader\ShaderCommon.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\PixelShader.hlsl" />
