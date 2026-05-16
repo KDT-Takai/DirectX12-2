@@ -11,6 +11,7 @@
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dxguid.lib")
 #pragma comment( lib, "d3dcompiler.lib" )
 
 #include "../Logger/Logger.hpp"
@@ -31,6 +32,13 @@ struct ConstantBufferView
     D3D12_CPU_DESCRIPTOR_HANDLE     HandleCPU;          // CPUディスクリプタハンドル
     D3D12_GPU_DESCRIPTOR_HANDLE     HandleGPU;          // GPUディスクリプタハンドル
     T* pBuffer;            // バッファ先頭へのポインタ
+};
+
+struct Texture
+{
+    ComPtr<ID3D12Resource>          pResource;      // リソース
+    D3D12_CPU_DESCRIPTOR_HANDLE     HandleCPU;      // CPUディスクリプタハンドル
+    D3D12_GPU_DESCRIPTOR_HANDLE     HandleGPU;      // GPUディスクリプタハンドル
 };
 
 class App
@@ -72,9 +80,11 @@ private:
     // フェンス
     ComPtr<ID3D12Fence> m_pFence;
     // ディスクリプタヒープ(深度ステンシルビュー)
-    ComPtr<ID3D12DescriptorHeap> m_pHeapDSV;
+//    ComPtr<ID3D12DescriptorHeap> m_pHeapDSV;
     // ディスクリプタヒープ
-    ComPtr<ID3D12DescriptorHeap> m_pHeapCBV;
+//    ComPtr<ID3D12DescriptorHeap> m_pHeapCBV;
+    // ディスクリプタヒープ(定数バッファビュー・シェーダリソースビュー・アンオーダードアクセスビュー)
+    ComPtr<ID3D12DescriptorHeap> m_pHeapCBV_SRV_UAV;
     // 頂点バッファ
     ComPtr<ID3D12Resource> m_pVB;
     // インデックスバッファ
@@ -107,6 +117,8 @@ private:
     ConstantBufferView<Transform> m_CBV[FrameCount*2];
     // 回転角
     float m_RotateAngle;
+    // テクスチャ
+	Texture m_Texture;
 
     bool InitApp();
     void TermApp();

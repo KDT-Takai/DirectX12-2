@@ -1,16 +1,25 @@
 // ピクセルシェーダの実装
 #include "ShaderCommon.hlsli"
 
-struct PSOutput
-{
-    float4 Color : SV_TARGET0;  // ピクセルカラー
-};
+// ピクセルシェーダのメインエントリーポイント
+//PSOutput main(ColorVSOutput input)
+//{
+//    // 色データをそのまま代入するだけの処理
+//    PSOutput output = (PSOutput) 0;
+//    output.Color = input.Color;
+//    return output;
+//};
+
+SamplerState ColorSmp : register(s0);
+Texture2D ColorMap : register(t0);
+
 
 // ピクセルシェーダのメインエントリーポイント
 PSOutput main(VSOutput input)
 {
-    // 色データをそのまま代入するだけの処理
     PSOutput output = (PSOutput) 0;
-    output.Color = input.Color;
+
+    output.Color = ColorMap.Sample(ColorSmp, input.TexCoord);
+
     return output;
-};
+}
