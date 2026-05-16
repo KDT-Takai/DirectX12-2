@@ -1,5 +1,5 @@
-## DirectX12FrameWork
+ï»¿## DirectX12FrameWork
 
-# ƒŠƒ“ƒN
-DirectX12‚ÌƒTƒ“ƒvƒ‹
+# ãƒªãƒ³ã‚¯
+DirectX12ã®ã‚µãƒ³ãƒ—ãƒ«
 https://gihyo.jp/book/2021/978-4-297-12365-9/support#support-download
