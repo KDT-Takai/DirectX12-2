@@ -1,20 +1,20 @@
-#include "FileUtil.hpp"
+ï»¿#include "FileUtil.hpp"
 
 bool SearchFilePath(const wchar_t* filename, std::wstring& result)
 {
 	if (filename == nullptr)
 	{
-		LOG_CRITICAL("filename‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ");
+		LOG_CRITICAL("filenameãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“");
 		return false;
 	}
 	if (wcscmp(filename, L"") == 0 || wcscmp(filename, L"") == 0)
 	{
-		LOG_CRITICAL("filename‚ª‹ó•¶š—ñ‚Å‚·");
+		LOG_CRITICAL("filenameãŒç©ºæ–‡å­—åˆ—ã§ã™");
 		return false;
 	}
 	wchar_t exePath[520] = {};
 	GetModuleFileNameW(nullptr, exePath, 520);
-	exePath[519] = L'\0';	// null I’[‰»
+	exePath[519] = L'\0';	// null çµ‚ç«¯åŒ–
 	PathRemoveFileSpecW(exePath);
 
 	wchar_t dstPath[520] = {};

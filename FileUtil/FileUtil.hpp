@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <string>
 #include <Shlwapi.h>
 
@@ -9,7 +9,7 @@
 bool SearchFilePath(const wchar_t* filename, std::wstring& result);
 
 // memo
-// g‚¢•û
+// ä½¿ã„æ–¹
 //std::wstring vsPath;
 //std::wstring psPath;
 //
@@ -18,11 +18,11 @@ bool SearchFilePath(const wchar_t* filename, std::wstring& result);
 //
 //if (!SearchFilePath(L"PixelShader.cso", psPath))
 //{ return false; }
-// ’¸“_ƒVƒF[ƒ_“Ç‚İ‚İ
+// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€èª­ã¿è¾¼ã¿
 //auto hr = D3DReadFileToBlob( vsPath.c_str(),pVSBlob.GetAddressOf());
 //if (FAILED(hr))
 //{ return false; }
-// ƒsƒNƒZƒ‹ƒVƒF[ƒ_“Ç‚İ‚İ
+// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€èª­ã¿è¾¼ã¿
 //hr = D3DReadFileToBlob(psPath.c_str(), pPSBlob.GetAddressOf());
 //if (FAILED(hr))
 //{ return false; }

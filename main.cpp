@@ -1,4 +1,4 @@
-#if define(DEBUG) || defined(_DEBUG)
+ï»¿#if define(DEBUG) || defined(_DEBUG)
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif//define(DEBUG) || defined(_DEBUG)
@@ -12,11 +12,11 @@ int wmain(int argc, wchar_t** argv, wchar_t** evnp)
 #if defined(DEBUG) || defined(_DEBUG)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif//defined(DEBUG) || defined(_DEBUG)
-	// spdlog‚Ì‰Šú‰»
+	// spdlogã®åˆæœŸåŒ–
     spdlog::set_pattern("[%H:%M:%S][%^%l%$][%s:%#] %v");
     spdlog::set_level(spdlog::level::trace);
 
-    // ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌÀs
+    // ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®å®Ÿè¡Œ
     App app(960, 540);
     app.Run();
 
