@@ -39,3 +39,12 @@ struct PSOutput
 {
     float4 Color : SV_TARGET0; // ピクセルカラー
 };
+
+// メッシュの描画
+//struct VSInput
+//{
+//    float3 Position : POSITIONT;    // 位置座標
+//    float3 Normal : NORMAL; // 法線ベクトル
+//    float2 TexCoord : TEXCOORD; // テクスチャ座標
+//    float3 Tangent : TANGENT;   // 接線ベクトル
+//};

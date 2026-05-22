@@ -15,6 +15,7 @@
 #pragma comment( lib, "d3dcompiler.lib" )
 
 #include "../Logger/Logger.hpp"
+#include "../Mesh/Mesh.h"
 
 template <typename T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 
@@ -119,6 +120,10 @@ private:
     float m_RotateAngle;
     // テクスチャ
 	Texture m_Texture;
+    // メッシュ
+    std::vector<Mesh> m_Meshes;
+    // マテリアル
+    std::vector<Material> m_Materials;
 
     bool InitApp();
     void TermApp();
