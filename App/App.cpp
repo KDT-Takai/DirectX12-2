@@ -796,13 +796,13 @@ bool App::OnInit()
         std::wstring vsPath;
         std::wstring psPath;
 
-        if (!SearchFilePath(L"VertexShader.cso", vsPath))
+        if (!SearchFilePath(L"res/VertexShader.cso", vsPath))
         {
 			LOG_CRITICAL("頂点シェーダのファイルパスの検索に失敗");
             return false;
         }
 
-        if (!SearchFilePath(L"PixelShader.cso", psPath))
+        if (!SearchFilePath(L"res/PixelShader.cso", psPath))
         {
 			LOG_CRITICAL("ピクセルシェーダのファイルパスの検索に失敗");
             return false;
